@@ -410,7 +410,6 @@ struct context {
     
 #if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
     int sql_mask;
-#endif
 
 #ifdef HAVE_SQLITE3
     sqlite3 *database_sqlite3;
@@ -422,6 +421,8 @@ struct context {
 
 #ifdef HAVE_PGSQL
     PGconn *database_pg;
+#endif
+
 #endif
 
     int movie_fps;

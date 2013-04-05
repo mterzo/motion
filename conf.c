@@ -166,6 +166,14 @@ static struct context **copy_bool(struct context **, const char *, int);
 static struct context **copy_int(struct context **, const char *, int);
 static struct context **config_thread(struct context **cnt, const char *str, int val);
 
+#if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
+static struct context **config_database_thread(struct context **cnt, 
+                                                    const char *str, int val);
+static const char *print_database_thread(struct context **cnt, char **, int,
+                                                unsigned int);
+                                                    
+#endif
+
 static const char *print_bool(struct context **, char **, int, unsigned int);
 static const char *print_int(struct context **, char **, int, unsigned int);
 static const char *print_string(struct context **, char **, int, unsigned int);
@@ -220,7 +228,7 @@ config_param config_params[] = {
     },
     {
     "log_level",
-    "# Level of log messages [1..9] (EMR, ALR, CRT, ERR, WRN, NTC, ERR, DBG, ALL). (default: 6 / NTC)",
+    "# Level of log messages [1..9] (EMR, ALR, CRT, ERR, WRN, NTC, INF, DBG, ALL). (default: 6 / NTC)",
     1,
     CONF_OFFSET(log_level),
     copy_int,
@@ -1531,6 +1539,21 @@ config_param config_params[] = {
     config_thread,
     print_thread
     },
+
+#if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
+    {
+    "db_config_table",
+    "\n##############################################################\n"
+    "DB Config Table defines the table that will be used to read camera\n"
+    "configuration."
+    "##############################################################\n",
+    1,
+    0,
+    config_database_thread,
+    print_database_thread
+    },
+#endif
+
     { NULL, NULL, 0, 0, NULL, NULL }
 };
 
@@ -2345,6 +2368,41 @@ static struct context **config_thread(struct context **cnt, const char *str,
 
     return cnt;
 }
+
+
+#if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
+/**
+ * config_database_thread
+ *      Is called during initial config file loading once.  
+ *      at which point it will create and modify thread objects
+ *      The size of the context array is increased and the main context's values are
+ *      copied to the new thread.
+ *
+ *      cnt  - pointer to the array of pointers pointing to the context structures
+ *      str  - pointer to a string which is the filename of the thread config file
+ *      val  - is not used. It is defined to be function header compatible with
+ *            copy_int, copy_bool and copy_string.
+ */
+static struct context **config_database_thread(struct context **cnt, 
+						const char *str, 
+						int val ATTRIBUTE_UNUSED)
+{
+    MOTION_LOG(NTC, TYPE_CORE, NO_ERRNO, "XXXXXXXX  - In theory I would create a db"
+                        "connection");
+
+    return cnt;	
+}
+
+static const char *print_database_thread(struct context **cnt, char **str,
+                                int parm ATTRIBUTE_UNUSED, unsigned int threadnr)
+{
+    char *retval = NULL;
+
+    return retval;
+}
+
+#endif
+
 
 /**
  * usage
