@@ -23,17 +23,6 @@
  */
 #    define FFMPEG_NO_NONSTD_MPEG1
 #    ifdef __GNUC__
-/* #warning is a non-standard gcc extension */
-#        warning **************************************************
-#        warning Your version of FFmpeg is newer than version 0.4.8
-#        warning Newer versions of ffmpeg do not support MPEG1 with
-#        warning non-standard framerate. MPEG1 will be disabled for
-#        warning normal video output. You can still use mpeg4 and
-#        warning and mpeg4ms which are both better in terms of size
-#        warning and quality. MPEG1 is always used for timelapse.
-#        warning Please read the Motion Guide for more information.
-#        warning Note that this is not an error message!
-#        warning **************************************************
 #    endif /* __GNUC__ */
 #endif /* LIBAVCODEC_BUILD > 4680 */
 
@@ -65,11 +54,8 @@
 
 // AV_VERSION_INT(a, b, c) (a<<16 | b<<8 | c) 
 // (54*2^16 | 6*2^8 | 100)
-#if LIBAVFORMAT_BUILD >= 3540580
+#if LIBAVFORMAT_BUILD >= AV_VERSION_INT(53,6,1)
 #define FF_API_NEW_AVIO
-#define URL_RDONLY  AVIO_FLAG_READ       /**< read-only */
-#define URL_WRONLY  AVIO_FLAG_WRITE      /**< write-only */
-#define URL_RDWR    AVIO_FLAG_READ_WRITE /**< read-write pseudo flag */
 #endif
 
 
@@ -203,7 +189,7 @@ static int file_read(URLContext *h, unsigned char *buf, int size)
 /**
  * file_write
  */
-static int file_write(URLContext *h, unsigned char *buf, int size)
+static int file_write(URLContext *h, const unsigned char *buf, int size)
 {
     FILE *fh = (FILE *)h->priv_data;
     return fwrite(buf, 1, size, fh);
@@ -853,7 +839,7 @@ int ffmpeg_put_other_image(struct ffmpeg *ffmpeg, unsigned char *y,
  */
 int ffmpeg_put_frame(struct ffmpeg *ffmpeg, AVFrame *pic)
 {
-    int out_size, ret, got_packet_ptr;
+    int out_size, ret;
 
 #ifdef FFMPEG_AVWRITEFRAME_NEWAPI
     AVPacket pkt;
@@ -878,23 +864,9 @@ int ffmpeg_put_frame(struct ffmpeg *ffmpeg, AVFrame *pic)
             (uint8_t *)pic, sizeof(AVPicture));
 #endif /* FFMPEG_AVWRITEFRAME_NEWAPI */
     } else {
-        /* Encodes the image. */
-#if defined FF_API_NEW_AVIO
-        pkt.data = ffmpeg->video_outbuf;
-        pkt.size = ffmpeg->video_outbuf_size;
-
-        out_size = avcodec_encode_video2(AVSTREAM_CODEC_PTR(ffmpeg->video_st), 
-                                        &pkt, pic, &got_packet_ptr);
-        if (out_size < 0)
-            // Error encondig 
-            out_size = 0;
-        else
-            out_size = pkt.size;
-#else
         out_size = avcodec_encode_video(AVSTREAM_CODEC_PTR(ffmpeg->video_st),
                                         ffmpeg->video_outbuf,
                                         ffmpeg->video_outbuf_size, pic);
-#endif
         /* If zero size, it means the image was buffered. */
         if (out_size != 0) {
             /*

@@ -279,8 +279,7 @@ static void send_template(int client_socket, char *res)
  */
 static void send_template_raw(int client_socket, char *res)
 {
-    ssize_t nwrite = 0;
-    nwrite = write_nonblock(client_socket, res, strlen(res));
+    write_nonblock(client_socket, res, strlen(res));
 }
 
 /**
@@ -288,8 +287,7 @@ static void send_template_raw(int client_socket, char *res)
  */
 static void send_template_end_client(int client_socket)
 {
-    ssize_t nwrite = 0;
-    nwrite = write_nonblock(client_socket, end_template, strlen(end_template));
+     write_nonblock(client_socket, end_template, strlen(end_template));
 }
 
 /**
@@ -297,8 +295,7 @@ static void send_template_end_client(int client_socket)
  */
 static void response_client(int client_socket, const char *template, char *back)
 {
-    ssize_t nwrite = 0;
-    nwrite = write_nonblock(client_socket, template, strlen(template));
+    write_nonblock(client_socket, template, strlen(template));
     if (back != NULL) {
         send_template(client_socket, back);
         send_template_end_client(client_socket);
