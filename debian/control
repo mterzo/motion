@@ -3,7 +3,9 @@ Section: graphics
 Priority: optional
 Maintainer: Juan Angulo Moreno <juan@apuntale.com>
 HomePage: http://motion.sf.net
-Build-Depends: debhelper (>= 6), dh-autoreconf, libjpeg-dev, zlib1g-dev, libavcodec-dev, libavformat-dev, libpq-dev, libmysqlclient-dev, libv4l-dev
+Build-Depends: debhelper (>= 6), dh-autoreconf, libjpeg-dev, zlib1g-dev,
+    libavcodec-dev, libavformat-dev, libpq-dev, libmysqlclient-dev,
+    libv4l-dev, libsqlite3-dev
 Standards-Version: 3.9.2
 
 Package: motion

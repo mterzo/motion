@@ -18,6 +18,7 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 endif
 
 config.status:
+	dpkg-checkbuilddeps
 	dh_testdir
 	dh_autoreconf
 	# Add here commands to configure the package.
