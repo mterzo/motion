@@ -51,6 +51,7 @@ struct config conf_template = {
     width:                          DEF_WIDTH,
     height:                         DEF_HEIGHT,
     quality:                        DEF_QUALITY,
+    camera_id:                      0,
     rotate_deg:                     0,
     max_changes:                    DEF_CHANGES,
     threshold_tune:                 0,
@@ -340,6 +341,16 @@ config_param config_params[] = {
     "# Image width (pixels). Valid range: Camera dependent, default: 352",
     0,
     CONF_OFFSET(width),
+    copy_int,
+    print_int
+    },
+    {
+    "camera_id",
+    "Id used to label the camera when inserting data into SQL or saving the"
+    "camera image to disk.  This is better than using thread ID so that there"
+    "always is a consistent label",
+    0,
+    CONF_OFFSET(camera_id),
     copy_int,
     print_int
     },

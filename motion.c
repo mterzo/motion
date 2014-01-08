@@ -3203,6 +3203,9 @@ size_t mystrftime(const struct context *cnt, char *s, size_t max, const char *us
                     cnt->current_image->location.width);
                 break;
 
+            case 'I': // camera id
+                sprintf(tempstr, "%*d", width, cnt->conf.camera_id);
+                break;
             case 'J': // motion height
                 sprintf(tempstr, "%*d", width,
                     cnt->current_image->location.height);

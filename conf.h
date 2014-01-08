@@ -131,6 +131,7 @@ struct config {
     int text_double;
     const char *despeckle_filter;
     const char *area_detect;
+    int camera_id;
     int minimum_motion_frames;
     const char *exif_text;
     char *thread_dir;
