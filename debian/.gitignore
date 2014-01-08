@@ -1,0 +1,7 @@
+*.debhelper
+autoreconf.after
+autoreconf.before
+files
+motion.substvars
+debhelper
+motion
