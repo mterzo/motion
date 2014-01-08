@@ -1160,7 +1160,6 @@ if test "x${CPU_TYPE}" = "xunknown"; then
 			CPU_OPTIONS="-march=k6-3"
 			;;
 		*)
-			CPU_OPTIONS="-march=native -mtune=native"
 			;;
 		esac
 	fi
