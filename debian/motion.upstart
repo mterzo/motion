@@ -1,0 +1,11 @@
+# Motion Daemon 
+
+start on net-device-up
+stop on runlevel [06]
+
+description "Motion Detection"
+
+respawn
+
+exec /usr/local/bin/motion
+
