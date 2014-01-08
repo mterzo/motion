@@ -66,14 +66,7 @@ install: build-stamp
 	rm -rf $(CURDIR)/debian/motion/usr/share/doc/motion*
 	rm -f $(CURDIR)/debian/motion/etc/motion/motion-dist.conf
 	# Fix mode Daemon
-	cat $(CURDIR)/motion-dist.conf | sed 's/^daemon on/daemon off/g' > motion.conf
-	mv motion.conf $(CURDIR)/debian/motion/etc/motion/motion.conf	
-	# Fix path directory for pictures and films
-	cat $(CURDIR)/debian/motion/etc/motion/motion.conf | sed 's/target_dir \/usr\/local\/apache2\/htdocs\/cam1/target_dir \/tmp\/motion/g' > motion.conf
-	mv motion.conf $(CURDIR)/debian/motion/etc/motion/motion.conf
-	# Fix default format encoding
-	cat $(CURDIR)/debian/motion/etc/motion/motion.conf | sed 's/^ffmpeg_video_codec mpeg4/ffmpeg_video_codec swf/g' > motion.conf
-	mv motion.conf $(CURDIR)/debian/motion/etc/motion/motion.conf
+	cp debian/motion.conf $(CURDIR)/debian/motion/etc/motion/motion-dist.conf
 	# Remove dir/files unnecessary
 	rm -rf $(CURDIR)/debian/motion/usr/share/motion-3.2.12
 

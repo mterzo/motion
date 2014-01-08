@@ -31,8 +31,8 @@ add_group_if_missing
 add_user_if_missing
 
 # Fix motion.conf permission
-chmod 0640 /etc/motion/motion.conf
-chgrp motion /etc/motion/motion.conf
+chmod 0640 /etc/motion/motion-dist.conf
+chgrp motion /etc/motion/motion-dist.conf
 
 
 db_stop

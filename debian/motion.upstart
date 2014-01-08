@@ -7,5 +7,5 @@ description "Motion Detection"
 
 respawn
 
-exec /usr/local/bin/motion
+exec /usr/bin/motion
 
