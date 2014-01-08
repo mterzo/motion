@@ -133,6 +133,7 @@ struct config {
     const char *area_detect;
     int minimum_motion_frames;
     const char *exif_text;
+    char *thread_dir;
     char *pid_file;
     int argc;
     char **argv;
