@@ -1,3 +1,9 @@
+motion (3.4.0-mwt) unstable; urgency=medium
+
+  * Adding redis support for events
+
+ -- Mike Terzo <mike@terzo.org>  Tue, 28 Oct 2014 05:03:00 -0500
+
 motion (3.2.12-git) unstable; urgency=medium
 
   * git master branch plus my changes

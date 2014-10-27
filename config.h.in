@@ -18,6 +18,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* If redis is available */
+#undef HAVE_REDIS
+
 /* Define to 1 if you have MySQL support */
 #undef HAVE_MYSQL
 

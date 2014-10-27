@@ -5,14 +5,14 @@ Maintainer: Juan Angulo Moreno <juan@apuntale.com>
 HomePage: http://motion.sf.net
 Build-Depends: debhelper (>= 6), dh-autoreconf, libjpeg-dev, zlib1g-dev,
     libavcodec-dev, libavformat-dev, libpq-dev, libmysqlclient-dev,
-    libv4l-dev, libsqlite3-dev
+    libv4l-dev, libsqlite3-dev, libhiredis-dev
 Standards-Version: 3.9.2
 
 Package: motion
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, debconf
 Recommends: ffmpeg
-Suggests: mysql-client, postgresql-client
+Suggests: mysql-client, postgresql-client, libhiredis0.10
 Description: V4L capture program supporting motion detection
  Motion is a program that monitors the video signal from
  one or more cameras and is able to detect if a significant

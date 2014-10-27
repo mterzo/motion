@@ -593,6 +593,53 @@ fi
     AC_SUBST(RTPS_OBJ)
 
 #
+# Check Redis Support
+#
+
+REDIS_SUPPORT="no"
+REDIS_OBJ=""
+AC_ARG_WITH(redis,
+    [  --without-redis         Disable redis event notifications.
+    ],
+    REDIS="$withval"
+)
+if test "${REDIS}" = "no"; then
+    AC_MSG_CHECKING(for redis)
+    AC_MSG_RESULT(skipping)
+else
+    REDIS_INCDIR="no"
+    for w in /usr/include /usr/local/include; do
+        if test -f $w/hiredis.h; then
+            REDIS_INCDIR=$w
+            break
+        fi
+
+        if test -f $w/hiredis/hiredis.h; then
+            REDIS_INCDIR=$w/hiredis
+            break
+        fi
+
+    done
+
+    if test "${REDIS_INCDIR}" = "no"; then
+        AC_MSG_RESULT(No headers skipping)
+    else
+        AC_CHECK_LIB(hiredis, redisConnect,
+        [
+        TEMP_LIBS="$TEMP_LIBS -lhiredis"
+        REDIS_SUPPORT="yes"
+        AC_DEFINE([HAVE_REDIS],1,[Define to 1 if you have REDIS support])
+        ]
+        )
+    fi
+fi
+
+if test "${REDIS_SUPPORT}" = "yes"; then
+    REDIS_OBJ="motion_redis.o"
+    AC_SUBST(REDIS_OBJ)
+fi
+
+#
 # Check SQLITE3
 #
 
@@ -1377,6 +1424,13 @@ if test "${PGSQL_SUPPORT}" = "yes"; then
 else
     echo "PostgreSQL support:  No"
 fi
+
+if test "${REDIS_SUPPORT}" = "yes"; then
+    echo "REDIS support:       Yes"
+else
+    echo "REDIS support:       No"
+fi
+
 echo
 echo "CFLAGS: $CFLAGS"
 echo "LIBS: $LIBS"

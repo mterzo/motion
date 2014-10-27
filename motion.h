@@ -16,6 +16,10 @@
 #define BSD
 #endif
 
+#ifdef HAVE_REDIS
+#include <hiredis/hiredis.h>
+#endif
+
 /* Includes */
 #ifdef HAVE_MYSQL
 #include <mysql.h>
@@ -410,7 +414,11 @@ struct context {
 
     struct stream stream;
     int stream_count;
-    
+
+#if defined(HAVE_REDIS)
+    redisContext *redisContext;
+#endif
+
 #if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
     int sql_mask;
 #endif

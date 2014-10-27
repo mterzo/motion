@@ -22,6 +22,10 @@
 #include "picture.h"
 #include "rotate.h"
 
+#if defined(HAVE_REDIS)
+#include "motion_redis.h"
+#endif
+
 /* Forward declarations */
 static int motion_init(struct context *cnt);
 static void motion_cleanup(struct context *cnt);
@@ -805,6 +809,12 @@ static int motion_init(struct context *cnt)
     }
 #endif /* !WITHOUT_V4L && !BSD */
 
+#if defined(HAVE_REDIS)
+    if ( motion_init_redis(cnt) ) {
+        exit(1);
+    }
+#endif
+
 #if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
     if (cnt->conf.database_type) {
         MOTION_LOG(NTC, TYPE_DB, NO_ERRNO, "%s: Database backend %s",
@@ -972,6 +982,8 @@ static void motion_cleanup(struct context *cnt)
         vid_close(cnt);
     }
 
+    cnt->webcontrol_finish = 1;
+
     free(cnt->imgs.out);
     cnt->imgs.out = NULL;
 
@@ -1046,6 +1058,11 @@ static void motion_cleanup(struct context *cnt)
             sqlite3_close(cnt->database_sqlite3);
 #endif /* HAVE_SQLITE3 */
     }
+
+#ifdef HAVE_REDIS
+    motion_redis_cleanup(cnt);
+#endif
+
 }
 
 /**

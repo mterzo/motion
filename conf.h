@@ -104,6 +104,13 @@ struct config {
     int sql_log_snapshot;
     int sql_log_movie;
     int sql_log_timelapse;
+
+#if defined (HAVE_REDIS)
+    const char *redis_host;
+    int redis_port;
+    const char *redis_queue_name;
+#endif
+
     const char *sql_query;
     const char *database_type;
     const char *database_dbname;

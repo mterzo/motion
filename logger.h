@@ -45,7 +45,8 @@
 #define TYPE_EVENTS             6             /* Events logs       */
 #define TYPE_TRACK              7             /* Track logs        */
 #define TYPE_VIDEO              8             /* V4L1/2 Bktr logs  */
-#define TYPE_ALL                9             /* All type logs     */
+#define TYPE_REDIS              9             /* Redis logs        */
+#define TYPE_ALL                10            /* All type logs     */
 #define TYPE_DEFAULT            TYPE_ALL      /* Default type      */
 #define TYPE_DEFAULT_STR        "ALL"         /* Default name logs */
 

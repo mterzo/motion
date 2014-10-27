@@ -27,12 +27,17 @@
 #include <string.h>
 
 #include "motion.h"
+#include "event.h"
 
 #if (defined(BSD) && !defined(PWCBSD))
 #include "video_freebsd.h"
 #else
 #include "video.h"
 #endif /* BSD */
+
+#if defined(HAVE_REDIS)
+#include "motion_redis.h"
+#endif
 
 #define EXTENSION ".conf"
 
@@ -141,6 +146,11 @@ struct config conf_template = {
     sqlite3_db:                     NULL,
 #endif
 #endif /* defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || define(HAVE_SQLITE3) */
+#if defined(HAVE_REDIS)
+    redis_host:                     NULL,
+    redis_port:                     MOTION_REDIS_PORT,
+    redis_queue_name:               MOTION_REDIS_QUEUE,
+#endif
     on_picture_save:                NULL,
     on_motion_detected:             NULL,
     on_area_detected:               NULL,
@@ -1416,6 +1426,34 @@ config_param config_params[] = {
     copy_string,
     print_string
     },
+#if defined(HAVE_REDIS)
+    {
+    "redis_host",
+    "# Redis host to connect to to manage events (default: none)\n"
+    "# Enabling this turn on redis event pub/sub\n",
+    0,
+    CONF_OFFSET(redis_host),
+    copy_string,
+    print_string
+    },
+    {
+    "redis_port",
+    "# Redis server port (default: 6379)\n",
+    0,
+    CONF_OFFSET(redis_port),
+    copy_int,
+    print_int,
+    },
+    {
+    "redis_queue_name",
+    "# Base queue to be notified QUEUE:EVENT. (default: "
+    MOTION_REDIS_QUEUE")\n",
+    0,
+    CONF_OFFSET(redis_queue_name),
+    copy_string,
+    print_string
+    },
+#endif
 
 #if defined(HAVE_MYSQL) || defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
     {
@@ -2487,8 +2525,8 @@ static void usage()
     printf("-n\t\t\tRun in non-daemon mode.\n");
     printf("-s\t\t\tRun in setup mode.\n");
     printf("-c config\t\tFull path and filename of config file.\n");
-    printf("-d level\t\tLog level (1-9) (EMR, ALR, CRT, ERR, WRN, NTC, ERR, DBG, ALL). default: 6 / NTC.\n");
-    printf("-k type\t\t\tType of log (COR, STR, ENC, NET, DBL, EVT, TRK, VID, ALL). default: ALL.\n");
+    printf("-d level\t\tLog level (1-9) (EMR, ALR, CRT, ERR, WRN, NTC, INF, DBG, ALL). default: 6 / NTC.\n");
+    printf("-k type\t\t\tType of log (COR, STR, ENC, NET, DBL, EVT, TRK, VID, RDS, ALL). default: ALL.\n");
     printf("-p process_id_file\tFull path and filename of process id file (pid file).\n");
     printf("-l log file \t\tFull path and filename of log file.\n");
     printf("-m\t\t\tDisable motion detection at startup.\n");

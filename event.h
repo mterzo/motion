@@ -35,7 +35,7 @@ typedef enum {
     EVENT_LAST,
 } motion_event;
 
-
+extern const char *eventToString(motion_event e);
 typedef void(* event_handler)(struct context *, motion_event, unsigned char *,
              char *, void *, struct tm *);
 

@@ -15,6 +15,10 @@
 #include "video.h"
 #endif
 
+#ifdef HAVE_REDIS
+#include "motion_redis.h"
+#endif
+
 /* Various functions (most doing the actual action) */
 
 const char *eventList[] = {
@@ -47,7 +51,7 @@ const char *eventList[] = {
  *
  * returns string label of the event
  */
-static const char *eventToString(motion_event e)
+const char *eventToString(motion_event e)
 {
     return eventList[(int)e];
 }
@@ -839,7 +843,6 @@ static void event_ffmpeg_timelapseend(struct context *cnt,
 
 #endif /* HAVE_FFMPEG */
 
-
 /*
  * Starting point for all events
  */
@@ -1000,4 +1003,10 @@ void event(struct context *cnt, motion_event type, unsigned char *image,
             event_handlers[i].handler(cnt, type, image, filename, eventdata,
                                       tm);
     }
+
+#if defined(HAVE_REDIS)
+    if (cnt->redisContext) {
+        redis_handle_event(cnt, type, image, filename, eventdata, tm);
+    }
+#endif
 }
