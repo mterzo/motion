@@ -6,8 +6,6 @@ motion
 config.h
 config.status
 Makefile
-build-stamp
-configure-stamp
 motion-dist.conf
 motion.init-Debian
 motion.init-Fedora
@@ -17,4 +15,3 @@ thread1.conf
 thread2.conf
 thread3.conf
 thread4.conf
-configure

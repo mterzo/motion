@@ -170,7 +170,6 @@ static void* handle_basic_auth(void* param)
     char buffer[1024] = {'\0'};
     ssize_t length = 1023;
     char *auth, *h, *authentication;
-    int ret;
     static const char *request_auth_response_template=
         "HTTP/1.0 401 Authorization Required\r\n"
         "Server: Motion/"VERSION"\r\n"
@@ -206,7 +205,7 @@ static void* handle_basic_auth(void* param)
         char *userpass = NULL;
         size_t auth_size = strlen(p->conf->stream_authentication);
 
-        authentication = (char *) mymalloc(BASE64_LENGTH(auth_size) + 1);
+        authentication = mymalloc(BASE64_LENGTH(auth_size) + 1);
         userpass = mymalloc(auth_size + 4);
         /* base64_encode can read 3 bytes after the end of the string, initialize it. */
         memset(userpass, 0, auth_size + 4);
@@ -243,7 +242,8 @@ static void* handle_basic_auth(void* param)
     pthread_exit(NULL);
 
 Error:
-    ret = write(p->sock, request_auth_response_template, strlen (request_auth_response_template));
+    if (write(p->sock, request_auth_response_template, strlen (request_auth_response_template)) < 0)
+        MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write failure 1:handle_basic_auth");
 
 Invalid_Request:
     close(p->sock);
@@ -396,7 +396,6 @@ static void* handle_md5_digest(void* param)
 #define SERVER_URI_LEN 512
     char server_uri[SERVER_URI_LEN];
     char* server_user = NULL, *server_pass = NULL;
-    int ret;
     unsigned int rand1,rand2;
     HASHHEX HA1;
     HASHHEX HA2 = "";
@@ -571,8 +570,10 @@ Error:
                 "Content-Length: %Zu\r\n\r\n",
                 request_auth_response_template, server_nonce,
                 KEEP_ALIVE_TIMEOUT, strlen(auth_failed_html_template));
-        ret = write(p->sock, buffer, strlen(buffer));
-        ret = write(p->sock, auth_failed_html_template, strlen(auth_failed_html_template));
+        if (write(p->sock, buffer, strlen(buffer)) < 0)
+            MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write failure 1:handle_md5_digest");
+        if (write(p->sock, auth_failed_html_template, strlen(auth_failed_html_template)) < 0)
+            MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write failure 2:handle_md5_digest");
     }
 
     // OK - Access
@@ -583,11 +584,8 @@ Error:
         goto Error;
     }
 
-    if(server_user)
-        free(server_user);
-
-    if(server_pass)
-        free(server_pass);
+    free(server_user);
+    free(server_pass);
 
     /* Lock the mutex */
     pthread_mutex_lock(&stream_auth_mutex);
@@ -603,13 +601,11 @@ Error:
     pthread_exit(NULL);
 
 InternalError:
-    if(server_user)
-        free(server_user);
+    free(server_user);
+    free(server_pass);
 
-    if(server_pass)
-        free(server_pass);
-
-    ret = write(p->sock, internal_error_template, strlen(internal_error_template));
+    if (write(p->sock, internal_error_template, strlen(internal_error_template)) < 0)
+      MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write failure 3:handle_md5_digest");
 
 Invalid_Request:
     close(p->sock);
@@ -696,8 +692,7 @@ static void do_client_auth(struct context *cnt, int sc)
 
 Error:
     close(sc);
-    if(handle_param)
-        free(handle_param);
+    free(handle_param);
 }
 
 /**
@@ -957,7 +952,7 @@ static void stream_add_client(struct stream *list, int sc)
                                  "Cache-Control: no-cache, private\r\n"
                                  "Pragma: no-cache\r\n"
                                  "Content-Type: multipart/x-mixed-replace; "
-                                 "boundary=--BoundaryString\r\n\r\n";
+                                 "boundary=BoundaryString\r\n\r\n";
 
     memset(new, 0, sizeof(struct stream));
     new->socket = sc;

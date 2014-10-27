@@ -284,6 +284,8 @@ static void send_template_raw(int client_socket, char *res)
 {
     ssize_t nwrite = 0;
     nwrite = write_nonblock(client_socket, res, strlen(res));
+    if (nwrite < 0)
+        MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write_nonblock returned value less than zero.");
 }
 
 /**
@@ -293,6 +295,9 @@ static void send_template_end_client(int client_socket)
 {
     ssize_t nwrite = 0;
     nwrite = write_nonblock(client_socket, end_template, strlen(end_template));
+    if (nwrite < 0)
+        MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write_nonblock returned value less than zero.");
+
 }
 
 /**
@@ -306,6 +311,9 @@ static void response_client(int client_socket, const char *template, char *back)
         send_template(client_socket, back);
         send_template_end_client(client_socket);
     }
+    if (nwrite < 0)
+        MOTION_LOG(DBG, TYPE_STREAM, SHOW_ERRNO, "%s: write_nonblock returned value less than zero.");
+
 }
 
 /**
@@ -373,9 +381,8 @@ static void url_decode(char *urlencoded, size_t length)
                 *urldecoded++ = c[1];
             }
 
-        } else if (*data == '+') {
-            *urldecoded++ = ' ';
-
+	} else if (*data == '<' || *data == '+' || *data == '>') {
+	  *urldecoded++ = ' ';
         } else {
             *urldecoded++ = *data;
         }
@@ -2494,7 +2501,7 @@ void httpd_run(struct context **cnt)
         char *userpass = NULL;
         size_t auth_size = strlen(cnt[0]->conf.webcontrol_authentication);
 
-        authentication = (char *) mymalloc(BASE64_LENGTH(auth_size) + 1);
+        authentication = mymalloc(BASE64_LENGTH(auth_size) + 1);
         userpass = mymalloc(auth_size + 4);
         /* base64_encode can read 3 bytes after the end of the string, initialize it */
         memset(userpass, 0, auth_size + 4);
@@ -2524,8 +2531,7 @@ void httpd_run(struct context **cnt)
 
     }
 
-    if (authentication != NULL)
-        free(authentication);
+    free(authentication);
     close(sd);
     MOTION_LOG(NTC, TYPE_STREAM, NO_ERRNO, "%s: motion-httpd Closing");
     pthread_mutex_destroy(&httpd_mutex);

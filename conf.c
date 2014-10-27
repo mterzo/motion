@@ -153,6 +153,7 @@ struct config conf_template = {
     netcam_keepalive:               "off",
     netcam_proxy:                   NULL,
     netcam_tolerant_check:          0,
+    rtsp_uses_tcp:                  1,
     text_changes:                   0,
     text_left:                      NULL,
     text_right:                     DEF_TIMESTAMP,
@@ -427,6 +428,15 @@ config_param config_params[] = {
     "# Default: off",
     0,
     CONF_OFFSET(netcam_tolerant_check),
+    copy_bool,
+    print_bool
+    },
+    {
+    "rtsp_uses_tcp",
+    "# RTSP connection uses TCP to communicate to the camera. Can prevent image corruption.\n"
+    "# Default: on",
+    1,
+    CONF_OFFSET(rtsp_uses_tcp),
     copy_bool,
     print_bool
     },
@@ -1599,11 +1609,14 @@ static void conf_cmdline(struct context *cnt, int thread)
      * if necessary. This is accomplished by calling mystrcpy();
      * see this function for more information.
      */
-    while ((c = getopt(conf->argc, conf->argv, "c:d:hmns?p:k:l:")) != EOF)
+    while ((c = getopt(conf->argc, conf->argv, "bc:d:hmns?p:k:l:")) != EOF)
         switch (c) {
         case 'c':
             if (thread == -1)
                 strcpy(cnt->conf_filename, optarg);
+            break;
+        case 'b':
+            cnt->daemon = 1;
             break;
         case 'n':
             cnt->daemon = 0;
@@ -1617,17 +1630,23 @@ static void conf_cmdline(struct context *cnt, int thread)
                 cnt->log_level = (unsigned int)atoi(optarg);
             break;
         case 'k':
-            if (thread == -1)
-                strcpy(cnt->log_type_str, optarg);
-            break;
+	  if (thread == -1) {
+	    strncpy(cnt->log_type_str, optarg, sizeof(cnt->log_type_str) - 1);
+	    cnt->log_type_str[sizeof(cnt->log_type_str) - 1] = '\0';
+	  }
+	  break;
         case 'p':
-            if (thread == -1)
-                strcpy(cnt->pid_file, optarg);
-            break;
+	  if (thread == -1) {
+	    strncpy(cnt->pid_file, optarg, sizeof(cnt->pid_file) - 1);
+	    cnt->pid_file[sizeof(cnt->pid_file) - 1] = '\0';
+	  }
+	  break;
         case 'l':
-            if (thread == -1)
-                strcpy(cnt->log_file, optarg);
-            break;
+	  if (thread == -1) {
+	    strncpy(cnt->log_file, optarg, sizeof(cnt->log_file) - 1);
+	    cnt->log_file[sizeof(cnt->log_file) - 1] = '\0';
+	  }
+	  break;
         case 'm':
             cnt->pause = 1;
             break;    
@@ -1832,7 +1851,7 @@ void conf_print(struct context **cnt)
                     fprintf(conffile, "%s\n", val);
 
                     if (strlen(val) == 0)
-                        fprintf(conffile, "; thread /usr/local/etc/thread1.conf\n");
+                        fprintf(conffile, "; thread %s/motion/thread1.conf\n", sysconfdir);
 
                     free(val);
                 } else if (thread == 0) {
@@ -1916,8 +1935,9 @@ struct context **conf_load(struct context **cnt)
     conf_cmdline(cnt[0], -1);
 
     if (cnt[0]->conf_filename[0]) { /* User has supplied filename on Command-line. */
-        strcpy(filename, cnt[0]->conf_filename);
-        fp = fopen (filename, "r");
+      strncpy(filename, cnt[0]->conf_filename, PATH_MAX-1);
+      filename[PATH_MAX-1] = '\0';
+      fp = fopen (filename, "r");
     }
 
     if (!fp) {  /* Command-line didn't work, try current dir. */
@@ -1942,7 +1962,7 @@ struct context **conf_load(struct context **cnt)
         fp = fopen(filename, "r");
 
         if (!fp) {
-            snprintf(filename, PATH_MAX, "%s/motion.conf", sysconfdir);
+            snprintf(filename, PATH_MAX, "%s/motion/motion.conf", sysconfdir);
             fp = fopen(filename, "r");
 
             if (!fp) /* There is no config file.... use defaults. */
@@ -1953,11 +1973,12 @@ struct context **conf_load(struct context **cnt)
 
     /* Now we process the motion.conf config file and close it. */
     if (fp) {
-        strcpy(cnt[0]->conf_filename, filename);
-        MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Processing thread 0 - config file %s",
-                   filename);
-        cnt = conf_process(cnt, fp);
-        myfclose(fp);
+      strncpy(cnt[0]->conf_filename, filename, sizeof(cnt[0]->conf_filename) - 1);
+      cnt[0]->conf_filename[sizeof(cnt[0]->conf_filename) - 1] = '\0';
+      MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Processing thread 0 - config file %s",
+		 filename);
+      cnt = conf_process(cnt, fp);
+      myfclose(fp);
     } else {
         MOTION_LOG(CRT, TYPE_ALL, NO_ERRNO, "%s: Not config file to process using default values");
     }
@@ -2200,7 +2221,7 @@ char *mystrdup(const char *from)
     } else {
         stringlength = strlen(from);
         stringlength = (stringlength < PATH_MAX ? stringlength : PATH_MAX);
-        tmp = (char *)mymalloc(stringlength + 1);
+        tmp = mymalloc(stringlength + 1);
         strncpy(tmp, from, stringlength);
 
         /*
@@ -2453,6 +2474,7 @@ static void usage()
     printf("\nusage:\tmotion [options]\n");
     printf("\n\n");
     printf("Possible options:\n\n");
+    printf("-b\t\t\tRun in background (daemon) mode.\n");
     printf("-n\t\t\tRun in non-daemon mode.\n");
     printf("-s\t\t\tRun in setup mode.\n");
     printf("-c config\t\tFull path and filename of config file.\n");
@@ -2464,6 +2486,6 @@ static void usage()
     printf("-h\t\t\tShow this screen.\n");
     printf("\n");
     printf("Motion is configured using a config file only. If none is supplied,\n");
-    printf("it will read motion.conf from current directory, ~/.motion or %s.\n", sysconfdir);
+    printf("it will read motion.conf from current directory, ~/.motion or %s/motion.\n", sysconfdir);
     printf("\n");
 }
