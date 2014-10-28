@@ -5,6 +5,8 @@
 motion
 config.h
 config.status
+configure
+autom4te.cache
 Makefile
 motion-dist.conf
 motion.init-Debian
