@@ -1626,8 +1626,16 @@ static void conf_cmdline(struct context *cnt, int thread)
             break;
         case 'd':
             /* No validation - just take what user gives. */
-            if (thread == -1)
+            if (thread == -1) {
                 cnt->log_level = (unsigned int)atoi(optarg);
+                /*
+                 * log_level wan't able to be parsed, we might have
+                 * a string here and not actually an int
+                 */
+                if (cnt->log_level == 0) {
+                    cnt->log_level = get_log_level_from_str(optarg);
+                }
+            }
             break;
         case 'k':
 	  if (thread == -1) {

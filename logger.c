@@ -78,6 +78,31 @@ const char* get_log_level_str(unsigned int level)
 }
 
 /**
+ * get_log_level_from_str
+ *     Gets the Int value of the log level
+ *
+ * Returns: value of a giving log level
+ */
+unsigned int get_log_level_from_str(char *level)
+{
+    unsigned int i = 0;
+    size_t maxSize;
+
+    /* make sure we don't walk off the end of the char array
+     * if someone shorts us a few chars.  Also we aren't
+     * walking off the log level array
+     */
+    maxSize = ( sizeof(level) < 3 ? sizeof(level) : 3 );
+
+    while(log_level_str[i] != NULL &&
+                strncmp(level, log_level_str[i], maxSize) ){
+        i++;
+    }
+
+    return i;
+}
+
+/**
  * set_log_level
  *      Sets log level.
  *

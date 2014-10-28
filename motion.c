@@ -2423,16 +2423,14 @@ static void motion_startup(int daemonize, int argc, char *argv[])
     cntlist_create(argc, argv);
 
     if ((cnt_list[0]->conf.log_level > ALL) ||
-        (cnt_list[0]->conf.log_level == 0)) {
+        (cnt_list[0]->conf.log_level < 0)) {
         cnt_list[0]->conf.log_level = LEVEL_DEFAULT;
-        cnt_list[0]->log_level = cnt_list[0]->conf.log_level;
-        MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Using default log level (%s) (%d)",
-                   get_log_level_str(cnt_list[0]->log_level), SHOW_LEVEL_VALUE(cnt_list[0]->log_level));
-    } else {
-        cnt_list[0]->log_level = cnt_list[0]->conf.log_level - 1; // Let's make syslog compatible
     }
+    cnt_list[0]->log_level = cnt_list[0]->conf.log_level;
 
-    //set_log_level(cnt_list[0]->log_level);
+    MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Using log level (%s) (%d)",
+               get_log_level_str(cnt_list[0]->log_level),
+               SHOW_LEVEL_VALUE(cnt_list[0]->log_level));
 
 #ifdef HAVE_SDL
      MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Motion "VERSION" Started with SDL support");
