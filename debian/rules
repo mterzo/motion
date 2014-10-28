@@ -30,7 +30,7 @@ config.status:
 		--datadir=\$${prefix}/share \
 		--mandir=\$${datadir}/man \
 		--infodir=\$${datadir}/info \
-		--sysconfdir=/etc/motion \
+		--sysconfdir=/etc \
 		--with-ffmpeg \
 		--with-mysql \
 		--with-pgsql
