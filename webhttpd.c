@@ -2535,6 +2535,7 @@ void httpd_run(struct context **cnt)
     close(sd);
     MOTION_LOG(NTC, TYPE_STREAM, NO_ERRNO, "%s: motion-httpd Closing");
     pthread_mutex_destroy(&httpd_mutex);
+    pthread_exit(NULL);
 }
 
 /**
