@@ -2380,6 +2380,7 @@ static struct context **read_thread_dir(struct context **cnt, const char *str,
                 cnt = config_thread(cnt, conf_file, 0);
             }
         }
+        closedir(dp);
     }
     else
     {
