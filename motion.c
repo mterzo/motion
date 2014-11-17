@@ -2402,6 +2402,11 @@ static void motion_shutdown(void)
 {
     int i = -1;
 
+
+#ifdef HAVE_REDIS
+    motion_redis_cleanup(cnt_list[0]);
+#endif
+
     motion_remove_pid();
 
     while (cnt_list[++i])
