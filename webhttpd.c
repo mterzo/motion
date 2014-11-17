@@ -2557,5 +2557,5 @@ void *motion_web_control(void *arg)
     pthread_mutex_unlock(&global_lock);
 
     MOTION_LOG(NTC, TYPE_STREAM, NO_ERRNO, "%s: motion-httpd thread exit");
-    pthread_exit(NULL);
+    return NULL;
 }

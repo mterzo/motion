@@ -340,6 +340,7 @@ static void sig_handler(int signo)
             while (cnt_list[++i]) {
                 cnt_list[i]->makemovie = 1;
                 cnt_list[i]->finish = 1;
+                cnt_list[i]->webcontrol_finish = 1;
                 /*
                  * Don't restart thread when it ends,
                  * all threads restarts if global restart is set
@@ -2616,7 +2617,7 @@ int main (int argc, char **argv)
 {
     int i;
     pthread_attr_t thread_attr;
-    pthread_t thread_id;
+    pthread_t web_thread_id;
 
     /*
      * Setup signals and do some initialization. 1 in the call to
@@ -2665,6 +2666,7 @@ int main (int argc, char **argv)
              * (including re-reading the config file(s)).
              */
             MOTION_LOG(WRN, TYPE_ALL, NO_ERRNO, "%s: Restarting motion.");
+            pthread_join(web_thread_id, NULL);
             motion_shutdown();
             restart = 0; /* only one reset for now */
 #ifndef WITHOUT_V4L
@@ -2712,7 +2714,7 @@ int main (int argc, char **argv)
          * detached and with 'motion_web_control' as the thread function.
          */
         if (cnt_list[0]->conf.webcontrol_port)
-            pthread_create(&thread_id, &thread_attr, &motion_web_control, cnt_list);
+            pthread_create(&web_thread_id, NULL, &motion_web_control, cnt_list);
 
         MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Waiting for threads to finish, pid: %d",
                    getpid());
@@ -2759,7 +2761,7 @@ int main (int argc, char **argv)
                         cnt_list[i]->finish = 1;
                     }
 
-                    if (cnt_list[i]->watchdog == -60) {
+                    if (cnt_list[i]->watchdog <= -60) {
                         MOTION_LOG(ERR, TYPE_ALL, NO_ERRNO, "%s: Thread %d - Watchdog timeout, did NOT restart graceful,"
                                    "killing it!", cnt_list[i]->threadnr);
                         pthread_cancel(cnt_list[i]->thread_id);
@@ -2798,6 +2800,7 @@ int main (int argc, char **argv)
     MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "%s: Motion terminating");
 
     /* Perform final cleanup. */
+    pthread_join(web_thread_id, NULL);
     pthread_key_delete(tls_key_threadnr);
     pthread_attr_destroy(&thread_attr);
     pthread_mutex_destroy(&global_lock);
