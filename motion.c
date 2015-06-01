@@ -3145,6 +3145,10 @@ size_t mystrftime(const struct context *cnt, char *s, size_t max, const char *us
                 --pos_userformat;
                 break;
 
+            case 'I':
+                sprintf(tempstr, "%d", cnt->conf.camera_id);
+                break;
+
             case 'v': // event
                 sprintf(tempstr, "%02d", cnt->event_nr);
                 break;
