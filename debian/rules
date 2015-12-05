@@ -84,8 +84,7 @@ binary-arch: build-stamp install
 	dh_testroot
 	dh_installchangelogs CHANGELOG
 	dh_installdocs
-	dh_installinit --init-script=motion \
-	                --update-rcd-params='start 60 2 3 4 5 . stop 60 0 1 6 .'
+	dh_installinit
 	dh_installman debian/motion.1
 	dh_installdebconf
 	dh_link
