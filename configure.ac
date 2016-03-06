@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.68])
 AC_INIT([motion], esyscmd(['./version.sh']),
         [https://github.com/mterzo/motion/issues])
 AC_CONFIG_SRCDIR([config.h.in])
@@ -65,8 +65,9 @@ else
 fi
 
 # Checks for programs.
-AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
+AC_CONFIG_TESTDIR([tests])
 
 # Checks for libraries.
 
@@ -167,8 +168,8 @@ if test "${FFMPEG_DIR}" = "no"; then
     AC_MSG_CHECKING(for ffmpeg)
     AC_MSG_RESULT(skipping)
 elif test "${FFMPEG_DIR}" = "yes"; then
-    PKG_CHECK_MODULES([LIBAVCODEC], [libavcodec >= 54])
-    PKG_CHECK_MODULES([LIBAVFORMAT], [libavformat >= 54])
+    PKG_CHECK_MODULES([LIBAVCODEC], [libavcodec >= 52])
+    PKG_CHECK_MODULES([LIBAVFORMAT], [libavformat >= 52])
 else
    echo "todo"
 fi
@@ -224,7 +225,8 @@ AC_CHECK_LIB(pthread, pthread_create)
 
 AC_CONFIG_FILES([Makefile
                  man/Makefile
-                 src/Makefile])
+                 src/Makefile
+                 tests/Makefile])
 AC_OUTPUT
 
 echo ""
