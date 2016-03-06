@@ -40,7 +40,7 @@
 char *get_current_dir_name(void)
 {
     char *buf = mymalloc(MAXPATHLEN);
-    getwd(buf);
+    getcwd(buf, MAXPATHLEN);
     return buf;
 }
 #endif
