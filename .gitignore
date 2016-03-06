@@ -7,7 +7,9 @@ motion
 config.h
 config.status
 autom4te.cache
+configure
 Makefile
+Makefile.in
 motion-dist.conf
 motion.init-Debian
 motion.init-Fedora
@@ -19,8 +21,4 @@ thread3.conf
 thread4.conf
 .*.sw*
 aclocal.m4
-compile
-depcomp
-install-sh
-missing
 stamp-h1
