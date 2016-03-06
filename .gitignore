@@ -1,6 +1,7 @@
 *.log
 .svn/
 *.o
+.deps
 .depend
 motion
 config.h
@@ -8,6 +9,7 @@ config.status
 configure
 autom4te.cache
 Makefile
+Makefile.in
 motion-dist.conf
 motion.init-Debian
 motion.init-Fedora
@@ -18,3 +20,9 @@ thread2.conf
 thread3.conf
 thread4.conf
 .*.sw*
+aclocal.m4
+compile
+depcomp
+install-sh
+missing
+stamp-h1
