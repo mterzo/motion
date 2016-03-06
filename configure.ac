@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([motion], 1.0, [https://github.com/mterzo/motion/issues])
+AC_INIT([motion], esyscmd(['./version.sh']),
+        [https://github.com/mterzo/motion/issues])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
@@ -122,6 +123,78 @@ if test x$JPEG_SUPPORT != xyes ; then
   )
 fi
 
+#
+# Check for libavcodec and libavformat from ffmpeg
+#
+
+FFMPEG_DIR="yes"
+FFMPEG_OK="no_found"
+FFMPEG_OBJ=""
+AC_ARG_WITH(ffmpeg,
+[  --with-ffmpeg[=DIR]       Specify the prefix for the install path for
+                          libavcodec/libavformat (part of ffmpeg) be able to
+                          encode mpeg movies realtime.
+                          If this is not specified motion will try to find
+                          the libraries in /usr and /usr/local.
+                          ],
+FFMPEG_DIR="$withval"
+)
+
+#
+# ffmpeg headers custom location
+#
+FFMPEG_HEADERS_DIR="yes"
+AC_ARG_WITH(ffmpeg_headers,
+[  --with-ffmpeg-headers[=DIR] Specify the prefix for ffmpeg headers.
+                               ],
+FFMPEG_HEADERS_DIR="$withval"
+)
+
+#
+# ffmpeg custom extra libraries
+#
+FFMPEG_EXTRALIBS="avformat avcodec avutil m z swscale "
+AC_ARG_WITH(ffmpeg-libs,
+[  --with-ffmpeg-libs[=libs]  Specify the extra libs for ffmpeg
+                               ],
+FFMPEG_EXTRALIBS="$withval"
+)
+
+#
+# --without-ffmpeg or with-ffmpeg=no
+#
+if test "${FFMPEG_DIR}" = "no"; then
+    AC_MSG_CHECKING(for ffmpeg)
+    AC_MSG_RESULT(skipping)
+elif test "${FFMPEG_DIR}" = "yes"; then
+    PKG_CHECK_MODULES([LIBAVCODEC], [libavcodec >= 54])
+    PKG_CHECK_MODULES([LIBAVFORMAT], [libavformat >= 54])
+else
+   echo "todo"
+fi
+
+#
+# sqllite support
+#
+
+SQLITE3_SUPPORT="no"
+AC_ARG_WITH(sqlite, [--with-sqlite[=dir] Enable sqlite database support],
+    [
+        if test x${witharg} = x""; then
+            PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+        else
+            tmp_cflags=${CFLAGS}
+            tmp_ldflags=${LDFLAGS}
+            CFLAGS += "-I${withval}/include"
+            LDFLAGS += "-L${withval}/lib"
+            AC_CHECK_LIB([SQLITE3],[sqlite3_version][],,
+                AC_MSG_ERROR([Could not find sqlite3 library]))
+            CFLAGS=$tmp_cflags
+            LDFLAGS=$tmp_ldflags
+        fi
+    ])
+
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h termios.h unistd.h])
 
@@ -170,16 +243,13 @@ else
 fi
 
 if test "${JPEG_SUPPORT_TURBO}" = "yes"; then
-    echo "jpeg turbo support:  Yes"
+    echo "JPEG turbo support:  Yes"
 elif test "${JPEG_SUPPORT_MMX}" = "yes"; then
-    echo "jpeg-mmx support:    Yes"
+    echo "JPEG-mmx support:    Yes"
 elif test "${JPEG_SUPPORT}" = "yes"; then
-    echo "jpeg support:        Yes"
+    echo "JPEG support:        Yes"
 else
-    echo "jpeg support:        No"
-    echo "**********************************************"
-    echo "** Fatal Error YOU MUST HAVE jpeg Support  ***"
-    echo "**********************************************"
+    AC_MSG_ERROR([Could not find jpeg library])
 fi
 
 if test "${SDL_SUPPORT}" = "yes"; then
@@ -188,10 +258,20 @@ else
     echo "SDL support:         No"
 fi
 
+if test x${LIBAVFORMAT_LIBS} != x""; then
+    echo "FFmpeg support:      Yes"
+else
+    echo "FFmpeg support:      No"
+fi
+
+if test x${SQLITE3_LIBS} != x""; then
+    echo "SQLite support:      Yes"
+else
+    echo "SQLite support:      No"
+fi
+
 echo
 echo "CFLAGS: $CFLAGS"
-echo "LIBS: $LIBS"
-echo "LDFLAGS: $LDFLAGS"
 echo
 echo "Install prefix:       $prefix"
 echo

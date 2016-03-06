@@ -7,9 +7,11 @@ motion_SOURCES = alg.c alg.h conf.c conf.h draw.c event.c event.h ffmpeg.c \
     picture.c picture.h pwc-ioctl.h rotate.c rotate.h stream.c 			   \
     stream.h track.c track.h video.h vloopback_motion.c             	   \
     vloopback_motion.h webhttpd.c webhttpd.h
-motion_CFLAGS=-Dsysconfdir='"$(sysconfdir)"'
 
-motion_LDADD=@JPEG_LIBS@
+motion_CFLAGS=-Dsysconfdir='"$(sysconfdir)"' @LIBAVCODEC_CFLAGS@           \
+	@LIBAVFORMAT_CFLAGS@ @SQLITE3_CFLAGS@
+
+motion_LDADD=@JPEG_LIBS@ @LIBAVCODEC_LIBS@ @LIBAVFORMAT_LIBS@ @SQLITE3_LIBS@
 
 if HAVE_SDL
 motion_SOURCES += sdl.c sdl.h

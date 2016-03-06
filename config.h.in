@@ -40,6 +40,9 @@
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
 
+/* Define to 1 if you have the `SQLITE3' library (-lSQLITE3). */
+#undef HAVE_LIBSQLITE3
+
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
