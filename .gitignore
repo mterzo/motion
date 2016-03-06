@@ -6,10 +6,8 @@
 motion
 config.h
 config.status
-configure
 autom4te.cache
 Makefile
-Makefile.in
 motion-dist.conf
 motion.init-Debian
 motion.init-Fedora
