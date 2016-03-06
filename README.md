@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mterzo/motion.svg?branch=master)](https://travis-ci.org/mterzo/motion)
+
 Motion up to version 3.1.8 was created and maintained by Jeroen Vreeken.
 Versions 3.1.9-3.1.12 was maintained by Kenneth Lavrsen (http://www.lavrsen.dk/)
 and Folkert van Heusden (http://www.vanheusden.com/).
@@ -16,7 +18,7 @@ GNU Wget. It has been merged and modified for use in the program Motion which
 is also released under the terms of the GNU General Public License.
 Copyright (C) 1995, 1996, 1997, 1998, 2000, 2001, 2002
 Free Software Foundation, Inc.
-The code contains additional modifications 
+The code contains additional modifications
 Additional Copyright (C) 2004-2005 Christopher Price,
 Angel Carpintero, and other contributing authors.
 
@@ -32,7 +34,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Wget; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */ 
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 
 Installing:
