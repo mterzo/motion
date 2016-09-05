@@ -1,7 +1,8 @@
 language: c
-before_script: autoreconf -fiv
+before_script: 
+  - ffmpeg -version
+  - autoreconf -fiv
 script: ./configure && make
-
 
 matrix:
   include:
@@ -9,6 +10,21 @@ matrix:
       addons:
         apt:
           packages:
+            - libavformat-dev
+            - libavcodec-dev
+            - libav-tools
+            - libavutil-dev
+            - libswscale-dev
+            - ffmpeg
+            - libjpeg8-dev
+            - libv4l-dev
+            - libzip-dev
+    - compiler: gcc
+      before_install:
+        - sudo add-apt-repository ppa:mc3man/trusty-media
+        - sudo apt-get -y update
+      addons:
+        apt:
             - libavformat-dev
             - libavcodec-dev
             - libav-tools
