@@ -1,4 +1,5 @@
 language: c
+compiler: gcc
 before_script: 
   - ffmpeg -version
   - autoreconf -fiv
@@ -6,7 +7,7 @@ script: ./configure && make
 
 matrix:
   include:
-    - compiler: gcc
+    - name: ubuntu 12.04
       addons:
         apt:
           packages:
@@ -19,12 +20,13 @@ matrix:
             - libjpeg8-dev
             - libv4l-dev
             - libzip-dev
-    - compiler: gcc
+    - name: ubuntu 12.04 ffmpeg 3.0.1
       before_install:
         - sudo add-apt-repository ppa:mc3man/trusty-media
         - sudo apt-get -y update
       addons:
         apt:
+          pacakges:
             - libavformat-dev
             - libavcodec-dev
             - libav-tools
